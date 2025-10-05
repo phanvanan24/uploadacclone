@@ -97,7 +97,8 @@ export async function register(req: Request, res: Response) {
       .single();
 
     if (error || !newUser) {
-      throw new Error('Không thể tạo tài khoản');
+      console.error('Supabase insert error:', error);
+      throw new Error(error?.message || 'Không thể tạo tài khoản');
     }
 
     req.session.userId = newUser.id;
