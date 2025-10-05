@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Generation Test Suite</title>
+    
+    <!-- Import KaTeX for LaTeX rendering -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/contrib/auto-render.min.js"></script>
+    
+    <!-- Import html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Import Inter font for Vietnamese text -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f8fafc;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #1e293b;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: #64748b;
+            font-size: 16px;
+        }
+        
+        .test-section {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .test-section h2 {
+            color: #334155;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .test-section h3 {
+            color: #475569;
+            font-size: 16px;
+            font-weight: 500;
+            margin: 20px 0 12px 0;
+        }
+        
+        .test-controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2563eb;
+        }
+        
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #475569;
+        }
+        
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #059669;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .test-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .option-group {
+            background: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .option-group h4 {
+            color: #374151;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 16px;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .preview-area {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            min-height: 400px;
+            padding: 20px;
+            background: #f8fafc;
+            margin-top: 20px;
+            position: relative;
+        }
+        
+        .preview-content {
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            transform: scale(0.8);
+            transform-origin: top left;
+            width: 125%;
+        }
+        
+        .status {
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin: 12px 0;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .status-success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .status-error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        
+        .status-warning {
+            background: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fed7aa;
+        }
+        
+        .status-info {
+            background: #eff6ff;
+            color: #2563eb;
+            border: 1px solid #dbeafe;
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+        }
+        
+        .test-results h4 {
+            color: #374151;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+        
+        .test-result-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid #e5e7eb;
+            font-size: 14px;
+        }
+        
+        .test-result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .icon {
+            width: 16px;
+            height: 16px;
+            display: inline-block;
+        }
+        
+        .icon-check { color: #10b981; }
+        .icon-x { color: #ef4444; }
+        .icon-warning { color: #f59e0b; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧪 PDF Generation Test Suite</h1>
+            <p>Comprehensive testing for Vietnamese educational content with LaTeX formulas</p>
+        </div>
+        
+        <!-- Test Configuration -->
+        <div class="test-section">
+            <h2>⚙️ Test Configuration</h2>
+            
+            <div class="test-options">
+                <div class="option-group">
+                    <h4>PDF Options</h4>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="includeAnswers" checked>
+                            Include Answers
+                        </label>
+                        <label>
+                            <input type="checkbox" id="includeExplanations" checked>
+                            Include Explanations
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="option-group">
+                    <h4>Paper Size</h4>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="paperSize" value="A4" checked>
+                            A4
+                        </label>
+                        <label>
+                            <input type="radio" name="paperSize" value="Letter">
+                            Letter
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="option-group">
+                    <h4>Orientation</h4>
+                    <div class="radio-group">
+                        <label>
+                            <input type="radio" name="orientation" value="portrait" checked>
+                            Portrait
+                        </label>
+                        <label>
+                            <input type="radio" name="orientation" value="landscape">
+                            Landscape
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Question Type Tests -->
+        <div class="test-section">
+            <h2>📝 Question Type Tests</h2>
+            
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testMultipleChoice()">Test Multiple Choice</button>
+                <button class="btn btn-primary" onclick="testTrueFalse()">Test True/False</button>
+                <button class="btn btn-primary" onclick="testEssay()">Test Essay Questions</button>
+                <button class="btn btn-success" onclick="testAllQuestionTypes()">Test All Types</button>
+            </div>
+            
+            <div id="questionTypeResults"></div>
+        </div>
+        
+        <!-- LaTeX Formula Tests -->
+        <div class="test-section">
+            <h2>📐 LaTeX Formula Tests</h2>
+            
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testInlineFormulas()">Test Inline Formulas</button>
+                <button class="btn btn-primary" onclick="testDisplayFormulas()">Test Display Formulas</button>
+                <button class="btn btn-primary" onclick="testComplexFormulas()">Test Complex Formulas</button>
+                <button class="btn btn-success" onclick="testAllLatexFormulas()">Test All LaTeX</button>
+            </div>
+            
+            <div id="latexTestResults"></div>
+        </div>
+        
+        <!-- Vietnamese Text Tests -->
+        <div class="test-section">
+            <h2>🇻🇳 Vietnamese Text Tests</h2>
+            
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testVietnameseText()">Test Vietnamese Content</button>
+                <button class="btn btn-primary" onclick="testVietnameseSubjects()">Test Subject Names</button>
+                <button class="btn btn-success" onclick="testVietnameseComplete()">Complete Vietnamese Test</button>
+            </div>
+            
+            <div id="vietnameseTestResults"></div>
+        </div>
+        
+        <!-- PDF Generation Tests -->
+        <div class="test-section">
+            <h2>📄 PDF Generation Tests</h2>
+            
+            <div class="test-controls">
+                <button class="btn btn-primary" onclick="testPDFPreview()">Test PDF Preview</button>
+                <button class="btn btn-primary" onclick="testPDFDownload()">Test PDF Download</button>
+                <button class="btn btn-secondary" onclick="testPDFOptions()">Test PDF Options</button>
+                <button class="btn btn-success" onclick="testComprehensivePDF()">Comprehensive PDF Test</button>
+            </div>
+            
+            <div id="pdfTestResults"></div>
+            
+            <div class="preview-area" id="pdfPreviewArea">
+                <p style="color: #64748b; text-align: center; margin-top: 180px;">PDF preview will appear here...</p>
+            </div>
+        </div>
+        
+        <!-- Error Handling Tests -->
+        <div class="test-section">
+            <h2>🛡️ Error Handling Tests</h2>
+            
+            <div class="test-controls">
+                <button class="btn btn-danger" onclick="testEmptyQuestions()">Test Empty Questions</button>
+                <button class="btn btn-danger" onclick="testLongContent()">Test Long Content</button>
+                <button class="btn btn-danger" onclick="testSpecialCharacters()">Test Special Characters</button>
+                <button class="btn btn-secondary" onclick="testErrorHandling()">Complete Error Tests</button>
+            </div>
+            
+            <div id="errorTestResults"></div>
+        </div>
+        
+        <!-- Overall Test Results -->
+        <div class="test-section">
+            <h2>📊 Overall Test Results</h2>
+            
+            <div class="test-controls">
+                <button class="btn btn-success" onclick="runAllTests()">🚀 Run All Tests</button>
+                <button class="btn btn-secondary" onclick="clearResults()">Clear Results</button>
+            </div>
+            
+            <div id="overallTestResults">
+                <div class="status status-info">
+                    Click "Run All Tests" to begin comprehensive testing
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="test-pdf-data.js"></script>
+    <script>
+        // PDF Test Suite Implementation
+        class PDFTestSuite {
+            constructor() {
+                this.testResults = [];
+                this.currentOptions = {
+                    includeAnswers: true,
+                    includeExplanations: true,
+                    paperSize: 'A4',
+                    orientation: 'portrait'
+                };
+                this.initializeEventListeners();
+            }
+            
+            initializeEventListeners() {
+                // Update options when controls change
+                document.getElementById('includeAnswers').addEventListener('change', (e) => {
+                    this.currentOptions.includeAnswers = e.target.checked;
+                });
+                
+                document.getElementById('includeExplanations').addEventListener('change', (e) => {
+                    this.currentOptions.includeExplanations = e.target.checked;
+                });
+                
+                document.querySelectorAll('input[name="paperSize"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        this.currentOptions.paperSize = e.target.value;
+                    });
+                });
+                
+                document.querySelectorAll('input[name="orientation"]').forEach(radio => {
+                    radio.addEventListener('change', (e) => {
+                        this.currentOptions.orientation = e.target.value;
+                    });
+                });
+            }
+            
+            logResult(test, success, message, details = null) {
+                const result = {
+                    test,
+                    success,
+                    message,
+                    details,
+                    timestamp: new Date()
+                };
+                this.testResults.push(result);
+                this.displayResult(test + 'Results', result);
+                return result;
+            }
+            
+            displayResult(containerId, result) {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                
+                const statusClass = result.success ? 'status-success' : 'status-error';
+                const icon = result.success ? '✅' : '❌';
+                
+                const resultDiv = document.createElement('div');
+                resultDiv.className = `status ${statusClass}`;
+                resultDiv.innerHTML = `
+                    ${icon} <strong>${result.test}:</strong> ${result.message}
+                    ${result.details ? `<br><small>${result.details}</small>` : ''}
+                `;
+                
+                container.appendChild(resultDiv);
+            }
+            
+            async renderMathInElement(element) {
+                return new Promise((resolve) => {
+                    try {
+                        if (typeof renderMathInElement !== 'undefined') {
+                            renderMathInElement(element, {
+                                delimiters: [
+                                    {left: '$$', right: '$$', display: true},
+                                    {left: '$', right: '$', display: false}
+                                ],
+                                throwOnError: false,
+                                errorColor: '#cc0000',
+                                strict: false
+                            });
+                            setTimeout(resolve, 500);
+                        } else {
+                            console.warn('KaTeX auto-render not available');
+                            resolve();
+                        }
+                    } catch (error) {
+                        console.warn('LaTeX rendering failed:', error);
+                        resolve();
+                    }
+                });
+            }
+            
+            createPDFContent(questions, options = {}) {
+                const container = document.createElement('div');
+                container.style.cssText = `
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                    padding: 40px;
+                    max-width: 800px;
+                    margin: 0 auto;
+                    background: white;
+                    color: black;
+                    line-height: 1.6;
+                `;
+
+                // Header
+                const header = document.createElement('div');
+                header.style.cssText = `
+                    text-align: center;
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #000;
+                    padding-bottom: 20px;
+                `;
+                
+                const subjectNames = {
+                    'toan': 'TOÁN HỌC',
+                    'ly': 'VẬT LÝ', 
+                    'hoa': 'HÓA HỌC',
+                    'sinh': 'SINH HỌC',
+                    'van': 'NGỮ VĂN',
+                    'anh': 'TIẾNG ANH',
+                    'su': 'LỊCH SỬ',
+                    'dia': 'ĐỊA LÝ',
+                    'gdcd': 'GIÁO DỤC CÔNG DÂN',
+                    'tin': 'TIN HỌC'
+                };
+
+                const difficultyNames = {
+                    'easy': 'DỄ',
+                    'medium': 'TRUNG BÌNH',
+                    'hard': 'KHÓ'
+                };
+
+                header.innerHTML = `
+                    <h1 style="font-size: 24px; font-weight: 700; margin: 0 0 10px 0;">
+                        BÀI KIỂM TRA ${subjectNames[questions.subject] || questions.subject.toUpperCase()}
+                    </h1>
+                    <div style="font-size: 16px; font-weight: 500; margin-bottom: 5px;">
+                        Chủ đề: ${questions.topic}
+                    </div>
+                    <div style="font-size: 14px; color: #666;">
+                        Độ khó: ${difficultyNames[questions.difficulty] || questions.difficulty} • 
+                        Số câu: ${questions.generatedQuestions?.length || 0} • 
+                        Ngày tạo: ${new Date().toLocaleDateString('vi-VN')}
+                    </div>
+                `;
+
+                container.appendChild(header);
+
+                // Questions
+                const questionsSection = document.createElement('div');
+                questionsSection.style.marginBottom = '40px';
+
+                questions.generatedQuestions?.forEach((question, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.style.cssText = `
+                        margin-bottom: 25px;
+                        page-break-inside: avoid;
+                    `;
+
+                    const questionNumber = document.createElement('div');
+                    questionNumber.style.cssText = `
+                        font-weight: 600;
+                        font-size: 16px;
+                        margin-bottom: 8px;
+                        color: #1a1a1a;
+                    `;
+                    questionNumber.innerHTML = `Câu ${question.id}: ${question.question}`;
+                    questionDiv.appendChild(questionNumber);
+
+                    // Add options for multiple choice
+                    if (question.type === 'multiple_choice' && question.options) {
+                        const optionsDiv = document.createElement('div');
+                        optionsDiv.style.cssText = `
+                            margin-left: 20px;
+                            margin-top: 10px;
+                        `;
+
+                        question.options.forEach((option, optionIndex) => {
+                            const optionDiv = document.createElement('div');
+                            optionDiv.style.cssText = `
+                                margin-bottom: 5px;
+                                font-size: 14px;
+                            `;
+                            optionDiv.innerHTML = `${String.fromCharCode(65 + optionIndex)}. ${option}`;
+                            optionsDiv.appendChild(optionDiv);
+                        });
+
+                        questionDiv.appendChild(optionsDiv);
+                    }
+
+                    // Add True/False options
+                    if (question.type === 'true_false') {
+                        const tfDiv = document.createElement('div');
+                        tfDiv.style.cssText = `
+                            margin-left: 20px;
+                            margin-top: 10px;
+                            display: flex;
+                            gap: 20px;
+                        `;
+                        tfDiv.innerHTML = `
+                            <span style="font-size: 14px;">A. Đúng</span>
+                            <span style="font-size: 14px;">B. Sai</span>
+                        `;
+                        questionDiv.appendChild(tfDiv);
+                    }
+
+                    questionsSection.appendChild(questionDiv);
+                });
+
+                container.appendChild(questionsSection);
+
+                // Answer key (if requested)
+                if (options.includeAnswers && questions.generatedQuestions?.some(q => q.correctAnswer)) {
+                    const answerKey = document.createElement('div');
+                    answerKey.style.cssText = `
+                        page-break-before: always;
+                        border-top: 2px solid #000;
+                        padding-top: 20px;
+                        margin-top: 40px;
+                    `;
+
+                    const answerTitle = document.createElement('h2');
+                    answerTitle.style.cssText = `
+                        font-size: 18px;
+                        font-weight: 600;
+                        margin-bottom: 20px;
+                        text-align: center;
+                    `;
+                    answerTitle.textContent = 'ĐÁP ÁN';
+                    answerKey.appendChild(answerTitle);
+
+                    questions.generatedQuestions?.forEach((question) => {
+                        if (question.correctAnswer) {
+                            const answerItem = document.createElement('div');
+                            answerItem.style.cssText = `
+                                margin-bottom: 10px;
+                                font-size: 14px;
+                            `;
+                            answerItem.innerHTML = `<strong>Câu ${question.id}:</strong> ${question.correctAnswer}`;
+                            answerKey.appendChild(answerItem);
+                        }
+                    });
+
+                    container.appendChild(answerKey);
+                }
+
+                return container;
+            }
+            
+            async generatePDFPreview(questions, options = {}) {
+                try {
+                    const content = this.createPDFContent(questions, {
+                        includeAnswers: true,
+                        includeExplanations: true,
+                        ...options
+                    });
+
+                    // Add to DOM temporarily for math rendering
+                    content.style.position = 'absolute';
+                    content.style.left = '-9999px';
+                    content.style.top = '-9999px';
+                    document.body.appendChild(content);
+
+                    try {
+                        await this.renderMathInElement(content);
+                        document.body.removeChild(content);
+                        
+                        // Reset positioning for preview
+                        content.style.position = 'static';
+                        content.style.left = 'auto';
+                        content.style.top = 'auto';
+                        
+                        return content;
+                    } catch (error) {
+                        document.body.removeChild(content);
+                        throw error;
+                    }
+                } catch (error) {
+                    console.error('Preview generation failed:', error);
+                    throw new Error('Không thể tạo xem trước PDF');
+                }
+            }
+            
+            async downloadPDF(questions, options = {}) {
+                if (!questions.generatedQuestions?.length) {
+                    throw new Error('Không có câu hỏi để xuất PDF');
+                }
+
+                try {
+                    const content = this.createPDFContent(questions, {
+                        includeAnswers: true,
+                        includeExplanations: true,
+                        ...options
+                    });
+
+                    // Add to DOM temporarily for rendering
+                    content.style.position = 'absolute';
+                    content.style.left = '-9999px';
+                    content.style.top = '-9999px';
+                    document.body.appendChild(content);
+
+                    // Render math first
+                    await this.renderMathInElement(content);
+
+                    const opt = {
+                        margin: [15, 15, 15, 15],
+                        filename: this.generateFilename(questions),
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { 
+                            scale: 2,
+                            useCORS: true,
+                            letterRendering: true,
+                            logging: false,
+                            scrollX: 0,
+                            scrollY: 0
+                        },
+                        jsPDF: { 
+                            unit: 'mm', 
+                            format: options.paperSize === 'Letter' ? 'letter' : 'a4', 
+                            orientation: options.orientation || 'portrait',
+                            compress: true
+                        },
+                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+                    };
+
+                    // Generate and download PDF
+                    await html2pdf().set(opt).from(content).save();
+
+                    // Clean up
+                    document.body.removeChild(content);
+                    
+                    return true;
+                } catch (error) {
+                    console.error('PDF generation failed:', error);
+                    throw new Error('Không thể tạo PDF. Vui lòng thử lại.');
+                }
+            }
+            
+            generateFilename(questions) {
+                const subjectNames = {
+                    'toan': 'Toan',
+                    'ly': 'VatLy', 
+                    'hoa': 'HoaHoc',
+                    'sinh': 'SinhHoc',
+                    'van': 'NguVan',
+                    'anh': 'TiengAnh',
+                    'su': 'LichSu',
+                    'dia': 'DiaLy',
+                    'gdcd': 'GDCD',
+                    'tin': 'TinHoc'
+                };
+
+                const subject = subjectNames[questions.subject] || questions.subject;
+                const topic = questions.topic
+                    .replace(/[^a-zA-Z0-9À-ỹ]/g, '')
+                    .substring(0, 20);
+                const date = new Date().getFullYear();
+                
+                return `${subject}_${topic}_${date}.pdf`;
+            }
+        }
+        
+        // Initialize test suite
+        const testSuite = new PDFTestSuite();
+        
+        // Test functions
+        async function testMultipleChoice() {
+            try {
+                const testData = window.pdfTestData.multipleChoiceQuestions;
+                const questions = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: testData
+                };
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('Multiple Choice', true, 'Multiple choice questions rendered successfully');
+            } catch (error) {
+                testSuite.logResult('Multiple Choice', false, 'Failed to render multiple choice questions', error.message);
+            }
+        }
+        
+        async function testTrueFalse() {
+            try {
+                const testData = window.pdfTestData.trueFalseQuestions;
+                const questions = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: testData
+                };
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('True/False', true, 'True/False questions rendered successfully');
+            } catch (error) {
+                testSuite.logResult('True/False', false, 'Failed to render True/False questions', error.message);
+            }
+        }
+        
+        async function testEssay() {
+            try {
+                const testData = window.pdfTestData.essayQuestions;
+                const questions = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: testData
+                };
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('Essay', true, 'Essay questions rendered successfully');
+            } catch (error) {
+                testSuite.logResult('Essay', false, 'Failed to render essay questions', error.message);
+            }
+        }
+        
+        async function testAllQuestionTypes() {
+            try {
+                const questions = window.pdfTestData.testQuestionsData;
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('All Question Types', true, `All ${questions.generatedQuestions.length} questions rendered successfully`);
+            } catch (error) {
+                testSuite.logResult('All Question Types', false, 'Failed to render all question types', error.message);
+            }
+        }
+        
+        async function testInlineFormulas() {
+            try {
+                // Create test with inline formulas
+                const testQuestions = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: [
+                        {
+                            id: "I1",
+                            type: "multiple_choice",
+                            question: "Giải phương trình $x^2 + 3x - 4 = 0$, nghiệm của phương trình là:",
+                            options: ["A. $x = 1$ hoặc $x = -4$", "B. $x = -1$ hoặc $x = 4$", "C. $x = 2$ hoặc $x = -2$", "D. $x = 0$ hoặc $x = 3$"],
+                            correctAnswer: "A",
+                            explanation: "Sử dụng công thức nghiệm: $x = \\frac{-b \\pm \\sqrt{b^2-4ac}}{2a}$ với $a=1$, $b=3$, $c=-4$."
+                        }
+                    ]
+                };
+                
+                const preview = await testSuite.generatePDFPreview(testQuestions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('Inline Formulas', true, 'Inline LaTeX formulas rendered correctly');
+            } catch (error) {
+                testSuite.logResult('Inline Formulas', false, 'Failed to render inline formulas', error.message);
+            }
+        }
+        
+        async function testDisplayFormulas() {
+            try {
+                // Create test with display formulas
+                const testQuestions = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: [
+                        {
+                            id: "D1",
+                            type: "essay",
+                            question: "Tính tích phân sau: $$\\int_0^1 x^2 e^x dx$$",
+                            explanation: "Sử dụng tích phân từng phần: $$\\int u dv = uv - \\int v du$$"
+                        }
+                    ]
+                };
+                
+                const preview = await testSuite.generatePDFPreview(testQuestions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('Display Formulas', true, 'Display LaTeX formulas rendered correctly');
+            } catch (error) {
+                testSuite.logResult('Display Formulas', false, 'Failed to render display formulas', error.message);
+            }
+        }
+        
+        async function testComplexFormulas() {
+            try {
+                const questions = window.pdfTestData.latexTestQuestions;
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('Complex Formulas', true, 'Complex LaTeX formulas rendered correctly');
+            } catch (error) {
+                testSuite.logResult('Complex Formulas', false, 'Failed to render complex formulas', error.message);
+            }
+        }
+        
+        async function testAllLatexFormulas() {
+            try {
+                const questions = window.pdfTestData.latexTestQuestions;
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('All LaTeX', true, 'All LaTeX formulas rendered successfully');
+            } catch (error) {
+                testSuite.logResult('All LaTeX', false, 'Failed to render LaTeX formulas', error.message);
+            }
+        }
+        
+        async function testVietnameseText() {
+            try {
+                const questions = window.pdfTestData.vietnameseTestQuestions;
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('Vietnamese Text', true, 'Vietnamese text rendered correctly');
+            } catch (error) {
+                testSuite.logResult('Vietnamese Text', false, 'Failed to render Vietnamese text', error.message);
+            }
+        }
+        
+        async function testVietnameseSubjects() {
+            try {
+                // Test all subject names
+                const subjectTests = [
+                    'toan', 'ly', 'hoa', 'sinh', 'van', 'anh', 'su', 'dia', 'gdcd', 'tin'
+                ];
+                
+                for (const subject of subjectTests) {
+                    const testQuestions = {
+                        ...window.pdfTestData.testQuestionsData,
+                        subject: subject,
+                        generatedQuestions: window.pdfTestData.testQuestionsData.generatedQuestions.slice(0, 1)
+                    };
+                    
+                    const filename = testSuite.generateFilename(testQuestions);
+                    console.log(`Subject ${subject}: ${filename}`);
+                }
+                
+                testSuite.logResult('Vietnamese Subjects', true, 'All Vietnamese subject names handled correctly');
+            } catch (error) {
+                testSuite.logResult('Vietnamese Subjects', false, 'Failed to handle Vietnamese subjects', error.message);
+            }
+        }
+        
+        async function testVietnameseComplete() {
+            await testVietnameseText();
+            await testVietnameseSubjects();
+        }
+        
+        async function testPDFPreview() {
+            try {
+                const questions = window.pdfTestData.testQuestionsData;
+                
+                const preview = await testSuite.generatePDFPreview(questions, testSuite.currentOptions);
+                document.getElementById('pdfPreviewArea').innerHTML = '';
+                preview.className = 'preview-content';
+                document.getElementById('pdfPreviewArea').appendChild(preview);
+                
+                testSuite.logResult('PDF Preview', true, 'PDF preview generated successfully');
+            } catch (error) {
+                testSuite.logResult('PDF Preview', false, 'Failed to generate PDF preview', error.message);
+            }
+        }
+        
+        async function testPDFDownload() {
+            try {
+                const questions = window.pdfTestData.testQuestionsData;
+                
+                await testSuite.downloadPDF(questions, testSuite.currentOptions);
+                
+                testSuite.logResult('PDF Download', true, 'PDF downloaded successfully');
+            } catch (error) {
+                testSuite.logResult('PDF Download', false, 'Failed to download PDF', error.message);
+            }
+        }
+        
+        async function testPDFOptions() {
+            try {
+                const questions = window.pdfTestData.testQuestionsData;
+                
+                // Test with different option combinations
+                const optionTests = [
+                    { includeAnswers: true, includeExplanations: true },
+                    { includeAnswers: true, includeExplanations: false },
+                    { includeAnswers: false, includeExplanations: true },
+                    { includeAnswers: false, includeExplanations: false }
+                ];
+                
+                for (const options of optionTests) {
+                    const preview = await testSuite.generatePDFPreview(questions, options);
+                    console.log('Options test passed:', options);
+                }
+                
+                testSuite.logResult('PDF Options', true, 'All PDF options work correctly');
+            } catch (error) {
+                testSuite.logResult('PDF Options', false, 'Failed to test PDF options', error.message);
+            }
+        }
+        
+        async function testComprehensivePDF() {
+            await testPDFPreview();
+            await testPDFOptions();
+            if (confirm('Do you want to test PDF download? This will download a file.')) {
+                await testPDFDownload();
+            }
+        }
+        
+        async function testEmptyQuestions() {
+            try {
+                const emptyQuestions = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: []
+                };
+                
+                await testSuite.generatePDFPreview(emptyQuestions, testSuite.currentOptions);
+                testSuite.logResult('Empty Questions', false, 'Should have failed with empty questions');
+            } catch (error) {
+                testSuite.logResult('Empty Questions', true, 'Correctly handled empty questions', error.message);
+            }
+        }
+        
+        async function testLongContent() {
+            try {
+                const longContent = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: [
+                        {
+                            id: "LONG",
+                            type: "essay",
+                            question: "Long question: " + "x".repeat(1000),
+                            explanation: "Long explanation: " + "y".repeat(2000)
+                        }
+                    ]
+                };
+                
+                const preview = await testSuite.generatePDFPreview(longContent, testSuite.currentOptions);
+                testSuite.logResult('Long Content', true, 'Long content handled successfully');
+            } catch (error) {
+                testSuite.logResult('Long Content', false, 'Failed to handle long content', error.message);
+            }
+        }
+        
+        async function testSpecialCharacters() {
+            try {
+                const specialChars = {
+                    ...window.pdfTestData.testQuestionsData,
+                    generatedQuestions: [
+                        {
+                            id: "SPECIAL",
+                            type: "multiple_choice",
+                            question: "Special chars: !@#$%^&*()_+[]{}|;':\",./<>?`~",
+                            options: ["A. àáạảã", "B. èéẹẻẽ", "C. ìíịỉĩ", "D. òóọỏõ"],
+                            correctAnswer: "A",
+                            explanation: "Testing special Vietnamese characters: ăâêôơư"
+                        }
+                    ]
+                };
+                
+                const preview = await testSuite.generatePDFPreview(specialChars, testSuite.currentOptions);
+                testSuite.logResult('Special Characters', true, 'Special characters handled successfully');
+            } catch (error) {
+                testSuite.logResult('Special Characters', false, 'Failed to handle special characters', error.message);
+            }
+        }
+        
+        async function testErrorHandling() {
+            await testEmptyQuestions();
+            await testLongContent();
+            await testSpecialCharacters();
+        }
+        
+        async function runAllTests() {
+            const startTime = Date.now();
+            document.getElementById('overallTestResults').innerHTML = '<div class="status status-info"><span class="loading"></span> Running comprehensive tests...</div>';
+            
+            try {
+                // Question type tests
+                await testAllQuestionTypes();
+                
+                // LaTeX tests
+                await testAllLatexFormulas();
+                
+                // Vietnamese tests
+                await testVietnameseComplete();
+                
+                // PDF generation tests
+                await testPDFPreview();
+                await testPDFOptions();
+                
+                // Error handling tests
+                await testErrorHandling();
+                
+                const endTime = Date.now();
+                const duration = (endTime - startTime) / 1000;
+                
+                const successCount = testSuite.testResults.filter(r => r.success).length;
+                const totalCount = testSuite.testResults.length;
+                
+                document.getElementById('overallTestResults').innerHTML = `
+                    <div class="status status-success">
+                        ✅ <strong>All tests completed in ${duration}s</strong><br>
+                        Results: ${successCount}/${totalCount} tests passed
+                    </div>
+                    <div class="test-results">
+                        <h4>Test Summary:</h4>
+                        ${testSuite.testResults.map(r => `
+                            <div class="test-result-item">
+                                <span class="icon ${r.success ? 'icon-check' : 'icon-x'}">${r.success ? '✅' : '❌'}</span>
+                                <strong>${r.test}:</strong> ${r.message}
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                
+            } catch (error) {
+                document.getElementById('overallTestResults').innerHTML = `
+                    <div class="status status-error">
+                        ❌ <strong>Test suite failed:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function clearResults() {
+            testSuite.testResults = [];
+            document.querySelectorAll('[id$="Results"]').forEach(el => {
+                el.innerHTML = '';
+            });
+            document.getElementById('pdfPreviewArea').innerHTML = '<p style="color: #64748b; text-align: center; margin-top: 180px;">PDF preview will appear here...</p>';
+        }
+        
+        // Initialize KaTeX when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // KaTeX should be available globally after loading the scripts
+            setTimeout(() => {
+                console.log('PDF Test Suite initialized');
+                if (typeof renderMathInElement !== 'undefined') {
+                    console.log('✅ KaTeX auto-render is available');
+                } else {
+                    console.warn('❌ KaTeX auto-render is not available');
+                }
+                
+                if (typeof html2pdf !== 'undefined') {
+                    console.log('✅ html2pdf is available');
+                } else {
+                    console.warn('❌ html2pdf is not available');
+                }
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

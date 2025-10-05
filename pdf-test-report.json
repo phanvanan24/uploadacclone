@@ -1,0 +1,314 @@
+{
+  "summary": {
+    "totalTests": 43,
+    "passed": 40,
+    "failed": 3,
+    "successRate": 93.02325581395348,
+    "duration": 0.009,
+    "timestamp": "2025-10-04T09:42:18.511Z",
+    "overallStatus": "FAILED"
+  },
+  "results": [
+    {
+      "test": "Data Structure - Required Fields",
+      "passed": true,
+      "message": "All required fields present",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.502Z"
+    },
+    {
+      "test": "Data Structure - Question Count",
+      "passed": true,
+      "message": "Question count matches array length",
+      "details": "Expected: 6, Actual: 6",
+      "timestamp": "2025-10-04T09:42:18.503Z"
+    },
+    {
+      "test": "Data Structure - Question Types",
+      "passed": true,
+      "message": "All question types represented",
+      "details": "Expected: multiple_choice, true_false, essay, Actual: multiple_choice, true_false, essay",
+      "timestamp": "2025-10-04T09:42:18.503Z"
+    },
+    {
+      "test": "MC Question 1 - Structure",
+      "passed": true,
+      "message": "Has all required fields",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.504Z"
+    },
+    {
+      "test": "MC Question 1 - Options Count",
+      "passed": true,
+      "message": "Has 4 options",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.504Z"
+    },
+    {
+      "test": "MC Question 1 - Answer Format",
+      "passed": true,
+      "message": "Correct answer format valid",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.504Z"
+    },
+    {
+      "test": "MC Question 1 - LaTeX Content",
+      "passed": true,
+      "message": "Contains LaTeX formulas",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.504Z"
+    },
+    {
+      "test": "MC Question 2 - Structure",
+      "passed": true,
+      "message": "Has all required fields",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.505Z"
+    },
+    {
+      "test": "MC Question 2 - Options Count",
+      "passed": true,
+      "message": "Has 4 options",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.505Z"
+    },
+    {
+      "test": "MC Question 2 - Answer Format",
+      "passed": true,
+      "message": "Correct answer format valid",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.505Z"
+    },
+    {
+      "test": "MC Question 2 - LaTeX Content",
+      "passed": true,
+      "message": "Contains LaTeX formulas",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.505Z"
+    },
+    {
+      "test": "TF Question 3 - Structure",
+      "passed": true,
+      "message": "Has all required fields",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.505Z"
+    },
+    {
+      "test": "TF Question 3 - Answer Format",
+      "passed": true,
+      "message": "Correct answer format valid",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.506Z"
+    },
+    {
+      "test": "TF Question 3 - LaTeX Content",
+      "passed": true,
+      "message": "Contains LaTeX formulas",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.506Z"
+    },
+    {
+      "test": "TF Question 4 - Structure",
+      "passed": true,
+      "message": "Has all required fields",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.506Z"
+    },
+    {
+      "test": "TF Question 4 - Answer Format",
+      "passed": true,
+      "message": "Correct answer format valid",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.506Z"
+    },
+    {
+      "test": "TF Question 4 - LaTeX Content",
+      "passed": true,
+      "message": "Contains LaTeX formulas",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.506Z"
+    },
+    {
+      "test": "Essay Question 5 - Structure",
+      "passed": true,
+      "message": "Has all required fields",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.506Z"
+    },
+    {
+      "test": "Essay Question 5 - Explanation Length",
+      "passed": true,
+      "message": "922 characters",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "Essay Question 5 - LaTeX Content",
+      "passed": true,
+      "message": "Contains LaTeX formulas",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "Essay Question 6 - Structure",
+      "passed": true,
+      "message": "Has all required fields",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "Essay Question 6 - Explanation Length",
+      "passed": true,
+      "message": "628 characters",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "Essay Question 6 - LaTeX Content",
+      "passed": true,
+      "message": "Contains LaTeX formulas",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Inline formulas ($...$)",
+      "passed": true,
+      "message": "Pattern detected",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Display formulas ($$...$$)",
+      "passed": true,
+      "message": "Pattern detected",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Fractions (\\frac{}{})",
+      "passed": true,
+      "message": "Pattern detected",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Integrals (\\int)",
+      "passed": true,
+      "message": "Pattern detected",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Square roots (\\sqrt{})",
+      "passed": false,
+      "message": "Pattern not found",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Summations (\\sum)",
+      "passed": false,
+      "message": "Pattern not found",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Limits (\\lim)",
+      "passed": false,
+      "message": "Pattern not found",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - Trigonometric functions",
+      "passed": true,
+      "message": "Pattern detected",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Pattern - LaTeX environments",
+      "passed": true,
+      "message": "Pattern detected",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "LaTeX Coverage",
+      "passed": true,
+      "message": "6/9 patterns found",
+      "details": "Good formula diversity",
+      "timestamp": "2025-10-04T09:42:18.507Z"
+    },
+    {
+      "test": "Vietnamese Characters",
+      "passed": true,
+      "message": "44/68 Vietnamese characters found",
+      "details": "Vietnamese text properly included",
+      "timestamp": "2025-10-04T09:42:18.509Z"
+    },
+    {
+      "test": "Subject Name Mapping",
+      "passed": true,
+      "message": "All subjects mapped correctly",
+      "details": "10 subjects mapped",
+      "timestamp": "2025-10-04T09:42:18.509Z"
+    },
+    {
+      "test": "Vietnamese Filename Generation",
+      "passed": true,
+      "message": "Valid filename generated",
+      "details": "Generated: NguVan_VănhọcViệtNamhiệnđại_2025.pdf",
+      "timestamp": "2025-10-04T09:42:18.509Z"
+    },
+    {
+      "test": "PDF Config 1",
+      "passed": true,
+      "message": "Valid configuration",
+      "details": "{\"includeAnswers\":true,\"includeExplanations\":true,\"paperSize\":\"A4\",\"orientation\":\"portrait\"}",
+      "timestamp": "2025-10-04T09:42:18.509Z"
+    },
+    {
+      "test": "PDF Config 2",
+      "passed": true,
+      "message": "Valid configuration",
+      "details": "{\"includeAnswers\":false,\"includeExplanations\":true,\"paperSize\":\"A4\",\"orientation\":\"portrait\"}",
+      "timestamp": "2025-10-04T09:42:18.511Z"
+    },
+    {
+      "test": "PDF Config 3",
+      "passed": true,
+      "message": "Valid configuration",
+      "details": "{\"includeAnswers\":true,\"includeExplanations\":false,\"paperSize\":\"Letter\",\"orientation\":\"landscape\"}",
+      "timestamp": "2025-10-04T09:42:18.511Z"
+    },
+    {
+      "test": "PDF Config 4",
+      "passed": true,
+      "message": "Valid configuration",
+      "details": "{\"includeAnswers\":false,\"includeExplanations\":false,\"paperSize\":\"Letter\",\"orientation\":\"portrait\"}",
+      "timestamp": "2025-10-04T09:42:18.511Z"
+    },
+    {
+      "test": "Empty Questions Handling",
+      "passed": true,
+      "message": "Empty questions detected correctly",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.511Z"
+    },
+    {
+      "test": "Missing Fields Detection",
+      "passed": true,
+      "message": "Missing fields detected",
+      "details": "Missing: question, options, correctAnswer",
+      "timestamp": "2025-10-04T09:42:18.511Z"
+    },
+    {
+      "test": "Long Content Handling",
+      "passed": true,
+      "message": "Long content test created",
+      "details": null,
+      "timestamp": "2025-10-04T09:42:18.511Z"
+    }
+  ]
+}
