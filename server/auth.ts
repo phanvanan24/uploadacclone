@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
-import { db } from "../db";
-import { users, blockedEmails } from "@db/schema";
-import { eq } from "drizzle-orm";
+import { supabase } from "./supabase";
 
 declare module "express-session" {
   interface SessionData {
@@ -51,25 +49,45 @@ export async function register(req: Request, res: Response) {
       return res.status(400).json({ message: "Email không hợp lệ" });
     }
 
-    const blocked = await db.select().from(blockedEmails).where(eq(blockedEmails.email, email.toLowerCase())).limit(1);
-    if (blocked.length > 0) {
+    const { data: blocked } = await supabase
+      .from('blocked_emails')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .limit(1)
+      .maybeSingle();
+
+    if (blocked) {
       return res.status(403).json({ message: "Email này không được phép đăng ký" });
     }
 
-    const existingUser = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
-    if (existingUser.length > 0) {
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .limit(1)
+      .maybeSingle();
+
+    if (existingUser) {
       return res.status(409).json({ message: "Email đã được đăng ký" });
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const [newUser] = await db.insert(users).values({
-      email: email.toLowerCase(),
-      passwordHash,
-      fullName,
-      gradeLevel,
-      classNumber: classNum,
-    }).returning();
+    const { data: newUser, error } = await supabase
+      .from('users')
+      .insert({
+        email: email.toLowerCase(),
+        password_hash: passwordHash,
+        full_name: fullName,
+        grade_level: gradeLevel,
+        class_number: classNum,
+      })
+      .select()
+      .single();
+
+    if (error || !newUser) {
+      throw new Error('Không thể tạo tài khoản');
+    }
 
     req.session.userId = newUser.id;
 
@@ -78,9 +96,9 @@ export async function register(req: Request, res: Response) {
       user: {
         id: newUser.id,
         email: newUser.email,
-        fullName: newUser.fullName,
-        gradeLevel: newUser.gradeLevel,
-        classNumber: newUser.classNumber,
+        fullName: newUser.full_name,
+        gradeLevel: newUser.grade_level,
+        classNumber: newUser.class_number,
       },
     });
   } catch (error) {
@@ -97,13 +115,18 @@ export async function login(req: Request, res: Response) {
       return res.status(400).json({ message: "Vui lòng nhập email và mật khẩu" });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.email, email.toLowerCase())).limit(1);
+    const { data: user } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email.toLowerCase())
+      .limit(1)
+      .maybeSingle();
 
     if (!user) {
       return res.status(401).json({ message: "Email hoặc mật khẩu không đúng" });
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    const isValidPassword = await bcrypt.compare(password, user.password_hash);
 
     if (!isValidPassword) {
       return res.status(401).json({ message: "Email hoặc mật khẩu không đúng" });
@@ -116,9 +139,9 @@ export async function login(req: Request, res: Response) {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
-        gradeLevel: user.gradeLevel,
-        classNumber: user.classNumber,
+        fullName: user.full_name,
+        gradeLevel: user.grade_level,
+        classNumber: user.class_number,
       },
     });
   } catch (error) {
@@ -143,7 +166,12 @@ export async function checkSession(req: Request, res: Response) {
       return res.json({ authenticated: false });
     }
 
-    const [user] = await db.select().from(users).where(eq(users.id, req.session.userId)).limit(1);
+    const { data: user } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', req.session.userId)
+      .limit(1)
+      .maybeSingle();
 
     if (!user) {
       req.session.destroy(() => {});
@@ -155,9 +183,9 @@ export async function checkSession(req: Request, res: Response) {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
-        gradeLevel: user.gradeLevel,
-        classNumber: user.classNumber,
+        fullName: user.full_name,
+        gradeLevel: user.grade_level,
+        classNumber: user.class_number,
       },
     });
   } catch (error) {

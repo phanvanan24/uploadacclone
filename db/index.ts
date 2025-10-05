@@ -6,7 +6,14 @@ if (!process.env.VITE_SUPABASE_URL) {
   throw new Error("VITE_SUPABASE_URL is not set");
 }
 
-const databaseUrl = `postgresql://postgres.iywrihakotxajrtsxvki:${process.env.DATABASE_PASSWORD || ""}@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres`;
+if (!process.env.VITE_SUPABASE_ANON_KEY) {
+  throw new Error("VITE_SUPABASE_ANON_KEY is not set");
+}
+
+const supabaseUrl = process.env.VITE_SUPABASE_URL.replace('https://', '');
+const projectRef = supabaseUrl.split('.')[0];
+
+const databaseUrl = `postgresql://postgres.${projectRef}:${process.env.DATABASE_PASSWORD || ""}@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres`;
 
 const sql = neon(databaseUrl);
 export const db = drizzle(sql, { schema });
