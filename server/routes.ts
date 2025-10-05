@@ -6,12 +6,17 @@ import {
   type GeneratedQuestion,
 } from "@shared/schema";
 import { z } from "zod";
+import { register, login, logout, checkSession, requireAuth } from "./auth";
 
 const OPENROUTER_API_KEY =
   process.env.OPENROUTER_API_KEY || process.env.VITE_OPENROUTER_API_KEY || "";
 const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  app.post("/api/auth/register", register);
+  app.post("/api/auth/login", login);
+  app.post("/api/auth/logout", logout);
+  app.get("/api/auth/session", checkSession);
   // Generate questions endpoint
   app.post("/api/questions/generate", async (req, res) => {
     try {
