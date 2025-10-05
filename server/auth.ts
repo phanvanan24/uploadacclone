@@ -24,6 +24,17 @@ export async function register(req: Request, res: Response) {
       return res.status(400).json({ message: "Mật khẩu phải có ít nhất 6 ký tự" });
     }
 
+    const hasUpperCase = /[A-Z]/.test(password);
+    const hasLowerCase = /[a-z]/.test(password);
+    const hasNumber = /[0-9]/.test(password);
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+
+    if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
+      return res.status(400).json({
+        message: "Mật khẩu phải có ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: Vanan24042008@)"
+      });
+    }
+
     const validGradeLevels = ["Tiểu học", "THCS", "THPT"];
     if (!validGradeLevels.includes(gradeLevel)) {
       return res.status(400).json({ message: "Cấp học không hợp lệ" });

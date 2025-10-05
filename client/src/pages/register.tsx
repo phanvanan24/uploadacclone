@@ -135,12 +135,15 @@ export default function RegisterPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Ít nhất 6 ký tự"
+                placeholder="Ví dụ: Vanan24042008@"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 minLength={6}
               />
+              <p className="text-xs text-gray-500">
+                Mật khẩu phải có ít nhất 6 ký tự, bao gồm chữ in hoa, in thường, số và ký tự đặc biệt
+              </p>
             </div>
 
             <div className="space-y-2">
