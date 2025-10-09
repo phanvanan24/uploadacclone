@@ -123,24 +123,36 @@ export async function login(req: Request, res: Response) {
   try {
     const { email, password } = req.body;
 
+    console.log("[LOGIN] Attempt with email:", email);
+
     if (!email || !password) {
+      console.log("[LOGIN] Missing email or password");
       return res.status(400).json({ message: "Vui lòng nhập email và mật khẩu" });
     }
 
-    const { data: user } = await supabase
+    const normalizedEmail = email.toLowerCase();
+    console.log("[LOGIN] Normalized email:", normalizedEmail);
+
+    const { data: user, error: dbError } = await supabase
       .from('users')
       .select('*')
-      .eq('email', email.toLowerCase())
+      .eq('email', normalizedEmail)
       .limit(1)
       .maybeSingle();
 
+    console.log("[LOGIN] Database query result:", { found: !!user, error: dbError });
+
     if (!user) {
+      console.log("[LOGIN] User not found for email:", normalizedEmail);
       return res.status(401).json({ message: "Email hoặc mật khẩu không đúng" });
     }
 
+    console.log("[LOGIN] User found, checking password for:", user.email);
     const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    console.log("[LOGIN] Password valid:", isValidPassword);
 
     if (!isValidPassword) {
+      console.log("[LOGIN] Invalid password for user:", user.email);
       return res.status(401).json({ message: "Email hoặc mật khẩu không đúng" });
     }
 
