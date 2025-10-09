@@ -60,17 +60,6 @@ export async function register(req: Request, res: Response) {
       return res.status(400).json({ message: "Email không hợp lệ" });
     }
 
-    const { data: blocked } = await supabase
-      .from('blocked_emails')
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .limit(1)
-      .maybeSingle();
-
-    if (blocked) {
-      return res.status(403).json({ message: "Email này không được phép đăng ký" });
-    }
-
     const { data: existingUser } = await supabase
       .from('users')
       .select('*')
