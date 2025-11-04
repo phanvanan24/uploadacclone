@@ -5,160 +5,57 @@ import { supabase } from "./supabase";
 declare module "express-session" {
   interface SessionData {
     userId: string;
-  }
-}
-
-export async function register(req: Request, res: Response) {
-  try {
-    const { fullName, gradeLevel, classNumber, email, password, confirmPassword } = req.body;
-
-    if (!fullName || !gradeLevel || !classNumber || !email || !password || !confirmPassword) {
-      return res.status(400).json({ message: "Vui lòng điền đầy đủ thông tin" });
-    }
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Mật khẩu xác nhận không khớp" });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({ message: "Mật khẩu phải có ít nhất 6 ký tự" });
-    }
-
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumber = /[0-9]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
-
-    if (!hasUpperCase || !hasLowerCase || !hasNumber || !hasSpecialChar) {
-      return res.status(400).json({
-        message: "Mật khẩu phải có ít nhất 1 chữ in hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt (ví dụ: Vanan24042008@)"
-      });
-    }
-
-    const validGradeLevels = ["Tiểu học", "THCS", "THPT"];
-    if (!validGradeLevels.includes(gradeLevel)) {
-      return res.status(400).json({ message: "Cấp học không hợp lệ" });
-    }
-
-    const classNum = parseInt(classNumber);
-    if (isNaN(classNum)) {
-      return res.status(400).json({ message: "Lớp học không hợp lệ" });
-    }
-
-    if (gradeLevel === "Tiểu học" && (classNum < 1 || classNum > 5)) {
-      return res.status(400).json({ message: "Lớp học Tiểu học phải từ 1 đến 5" });
-    }
-    if (gradeLevel === "THCS" && (classNum < 6 || classNum > 9)) {
-      return res.status(400).json({ message: "Lớp học THCS phải từ 6 đến 9" });
-    }
-    if (gradeLevel === "THPT" && (classNum < 10 || classNum > 12)) {
-      return res.status(400).json({ message: "Lớp học THPT phải từ 10 đến 12" });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Email không hợp lệ" });
-    }
-
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .limit(1)
-      .maybeSingle();
-
-    if (existingUser) {
-      return res.status(409).json({ message: "Email đã được đăng ký" });
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const { data: newUser, error } = await supabase
-      .from('users')
-      .insert({
-        email: email.toLowerCase(),
-        password_hash: passwordHash,
-        full_name: fullName,
-        grade_level: gradeLevel,
-        class_number: classNum,
-      })
-      .select()
-      .single();
-
-    if (error || !newUser) {
-      console.error('Supabase insert error:', error);
-      throw new Error(error?.message || 'Không thể tạo tài khoản');
-    }
-
-    req.session.userId = newUser.id;
-
-    res.json({
-      message: "Đăng ký thành công",
-      user: {
-        id: newUser.id,
-        email: newUser.email,
-        fullName: newUser.full_name,
-        gradeLevel: newUser.grade_level,
-        classNumber: newUser.class_number,
-      },
-    });
-  } catch (error) {
-    console.error("Registration error:", error);
-    res.status(500).json({ message: "Lỗi đăng ký tài khoản" });
+    role: string;
   }
 }
 
 export async function login(req: Request, res: Response) {
   try {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
-    console.log("[LOGIN] Attempt with email:", email);
+    console.log("[LOGIN] Attempt with username:", username);
 
-    if (!email || !password) {
-      console.log("[LOGIN] Missing email or password");
-      return res.status(400).json({ message: "Vui lòng nhập email và mật khẩu" });
+    if (!username || !password) {
+      console.log("[LOGIN] Missing username or password");
+      return res.status(400).json({ message: "Vui lòng nhập tên đăng nhập và mật khẩu" });
     }
 
-    const normalizedEmail = email.toLowerCase();
-    console.log("[LOGIN] Normalized email:", normalizedEmail);
-
-    const { data: user, error: dbError } = await supabase
-      .from('users')
+    const { data: account, error: dbError } = await supabase
+      .from('accounts')
       .select('*')
-      .eq('email', normalizedEmail)
+      .eq('username', username)
+      .eq('is_active', true)
       .limit(1)
       .maybeSingle();
 
-    console.log("[LOGIN] Database query result:", { found: !!user, error: dbError });
+    console.log("[LOGIN] Database query result:", { found: !!account, error: dbError });
 
-    if (!user) {
-      console.log("[LOGIN] User not found for email:", normalizedEmail);
-      return res.status(401).json({ message: "Email hoặc mật khẩu không đúng" });
+    if (!account) {
+      console.log("[LOGIN] Account not found for username:", username);
+      return res.status(401).json({ message: "Tên đăng nhập hoặc mật khẩu không đúng" });
     }
 
-    console.log("[LOGIN] User found, checking password for:", user.email);
-    const isValidPassword = await bcrypt.compare(password, user.password_hash);
+    console.log("[LOGIN] Account found, checking password for:", account.username);
+    const isValidPassword = await bcrypt.compare(password, account.password_hash);
     console.log("[LOGIN] Password valid:", isValidPassword);
 
     if (!isValidPassword) {
-      console.log("[LOGIN] Invalid password for user:", user.email);
-      return res.status(401).json({ message: "Email hoặc mật khẩu không đúng" });
+      console.log("[LOGIN] Invalid password for account:", account.username);
+      return res.status(401).json({ message: "Tên đăng nhập hoặc mật khẩu không đúng" });
     }
 
-    req.session.userId = user.id;
+    req.session.userId = account.id;
+    req.session.role = account.role;
 
     res.json({
-      message: "Đăng nhập thành công",
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.full_name,
-        gradeLevel: user.grade_level,
-        classNumber: user.class_number,
-      },
+      id: account.id,
+      username: account.username,
+      fullName: account.full_name,
+      role: account.role,
+      apiKey: account.api_key,
     });
   } catch (error) {
-    console.error("Login error:", error);
+    console.error("[LOGIN] Error:", error);
     res.status(500).json({ message: "Lỗi đăng nhập" });
   }
 }
@@ -168,48 +65,194 @@ export async function logout(req: Request, res: Response) {
     if (err) {
       return res.status(500).json({ message: "Lỗi đăng xuất" });
     }
-    res.clearCookie("connect.sid");
     res.json({ message: "Đăng xuất thành công" });
   });
 }
 
 export async function checkSession(req: Request, res: Response) {
-  try {
-    if (!req.session.userId) {
-      return res.json({ authenticated: false });
-    }
-
-    const { data: user } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', req.session.userId)
-      .limit(1)
-      .maybeSingle();
-
-    if (!user) {
-      req.session.destroy(() => {});
-      return res.json({ authenticated: false });
-    }
-
-    res.json({
-      authenticated: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        fullName: user.full_name,
-        gradeLevel: user.grade_level,
-        classNumber: user.class_number,
-      },
-    });
-  } catch (error) {
-    console.error("Session check error:", error);
-    res.status(500).json({ message: "Lỗi kiểm tra phiên đăng nhập" });
+  if (!req.session.userId) {
+    return res.status(401).json({ message: "Chưa đăng nhập" });
   }
+
+  const { data: account } = await supabase
+    .from('accounts')
+    .select('*')
+    .eq('id', req.session.userId)
+    .eq('is_active', true)
+    .limit(1)
+    .maybeSingle();
+
+  if (!account) {
+    req.session.destroy(() => {});
+    return res.status(401).json({ message: "Phiên đăng nhập không hợp lệ" });
+  }
+
+  res.json({
+    id: account.id,
+    username: account.username,
+    fullName: account.full_name,
+    role: account.role,
+    apiKey: account.api_key,
+  });
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
   if (!req.session.userId) {
-    return res.status(401).json({ message: "Vui lòng đăng nhập" });
+    return res.status(401).json({ message: "Cần đăng nhập" });
   }
   next();
+}
+
+export function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  if (!req.session.userId || req.session.role !== 'admin') {
+    return res.status(403).json({ message: "Chỉ admin mới có quyền truy cập" });
+  }
+  next();
+}
+
+export async function createStudentAccount(req: Request, res: Response) {
+  try {
+    const { username, password, apiKey, fullName } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ message: "Vui lòng nhập tên đăng nhập và mật khẩu" });
+    }
+
+    if (!apiKey) {
+      return res.status(400).json({ message: "Vui lòng nhập API key" });
+    }
+
+    const { data: existingAccount } = await supabase
+      .from('accounts')
+      .select('*')
+      .eq('username', username)
+      .limit(1)
+      .maybeSingle();
+
+    if (existingAccount) {
+      return res.status(400).json({ message: "Tên đăng nhập đã tồn tại" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const { data: newAccount, error } = await supabase
+      .from('accounts')
+      .insert({
+        username,
+        password_hash: hashedPassword,
+        role: 'student',
+        api_key: apiKey,
+        full_name: fullName || username,
+        created_by: req.session.userId,
+        is_active: true,
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("[CREATE_ACCOUNT] Error:", error);
+      return res.status(500).json({ message: "Lỗi tạo tài khoản" });
+    }
+
+    res.json({
+      id: newAccount.id,
+      username: newAccount.username,
+      fullName: newAccount.full_name,
+      role: newAccount.role,
+      createdAt: newAccount.created_at,
+    });
+  } catch (error) {
+    console.error("[CREATE_ACCOUNT] Error:", error);
+    res.status(500).json({ message: "Lỗi tạo tài khoản" });
+  }
+}
+
+export async function getAllStudents(req: Request, res: Response) {
+  try {
+    const { data: students, error } = await supabase
+      .from('accounts')
+      .select('id, username, full_name, api_key, created_at, is_active')
+      .eq('role', 'student')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("[GET_STUDENTS] Error:", error);
+      return res.status(500).json({ message: "Lỗi lấy danh sách học sinh" });
+    }
+
+    res.json(students);
+  } catch (error) {
+    console.error("[GET_STUDENTS] Error:", error);
+    res.status(500).json({ message: "Lỗi lấy danh sách học sinh" });
+  }
+}
+
+export async function updateStudentAccount(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const { password, apiKey, fullName, isActive } = req.body;
+
+    const updateData: any = {};
+
+    if (password) {
+      updateData.password_hash = await bcrypt.hash(password, 10);
+    }
+
+    if (apiKey !== undefined) {
+      updateData.api_key = apiKey;
+    }
+
+    if (fullName !== undefined) {
+      updateData.full_name = fullName;
+    }
+
+    if (isActive !== undefined) {
+      updateData.is_active = isActive;
+    }
+
+    const { data: updatedAccount, error } = await supabase
+      .from('accounts')
+      .update(updateData)
+      .eq('id', id)
+      .eq('role', 'student')
+      .select()
+      .single();
+
+    if (error) {
+      console.error("[UPDATE_ACCOUNT] Error:", error);
+      return res.status(500).json({ message: "Lỗi cập nhật tài khoản" });
+    }
+
+    res.json({
+      id: updatedAccount.id,
+      username: updatedAccount.username,
+      fullName: updatedAccount.full_name,
+      isActive: updatedAccount.is_active,
+    });
+  } catch (error) {
+    console.error("[UPDATE_ACCOUNT] Error:", error);
+    res.status(500).json({ message: "Lỗi cập nhật tài khoản" });
+  }
+}
+
+export async function deleteStudentAccount(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+
+    const { error } = await supabase
+      .from('accounts')
+      .delete()
+      .eq('id', id)
+      .eq('role', 'student');
+
+    if (error) {
+      console.error("[DELETE_ACCOUNT] Error:", error);
+      return res.status(500).json({ message: "Lỗi xóa tài khoản" });
+    }
+
+    res.json({ message: "Xóa tài khoản thành công" });
+  } catch (error) {
+    console.error("[DELETE_ACCOUNT] Error:", error);
+    res.status(500).json({ message: "Lỗi xóa tài khoản" });
+  }
 }
